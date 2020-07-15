@@ -75,61 +75,65 @@ def backgroundDownload():
 
 
 
-    for link in soup.findAll('a', href=re.compile('%')):
-        URLArray.append(link.get('href'))
+    # for link in soup.findAll('a', href=re.compile('%')):
+    #     URLArray.append(link.get('href'))
+    #     print(link.get('href'))
+
+    # for PartUrl in URLArray:
+    #     global max
+    #     url = 'https://pastpapers.co' + PartUrl
+    #     web = urllib.request.Request(url, headers={
+    #         'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"})
+    #     website = urllib.request.urlopen(web)
+    #     soup = BeautifulSoup(website)
+
+    # web = urllib.request(mainurl, headers={
+    #          'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"})
+
+    # website = urllib.request.urlopen(web)
+    fileName = []
+
+    for link in soup.findAll('a', href=re.compile('.pdf')):
+        fileName.append(link.get('href'))
         print(link.get('href'))
+    #
+    fPDF = fileName[1]
+    print('\n' + fPDF + '\n')
+    dir = fPDF.split('/')[11:13]
+    # del dir[0:2]
+    # del dir[-1]
+    print(dir)
+    max = len(fileName)
+    downloading['maximum'] = max
+    print(str(max) + ' max is \n')
+    downloading['value'] = 1
+    directory = '/'.join(dir)
+    if not os.path.exists(directory):
+        os.makedirs('/'.join(dir) + '/')
 
-    for PartUrl in URLArray:
-        global max
-        url = 'https://pastpapers.co' + PartUrl
-        web = urllib.request.Request(url, headers={
-            'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"})
-        website = urllib.request.urlopen(web)
-        soup = BeautifulSoup(website)
 
-        fileName = []
 
-        for link in soup.findAll('a', href=re.compile('.pdf')):
-            fileName.append(link.get('href'))
-            print(link.get('href'))
-
-        fPDF = fileName[1]
-        print('\n' + fPDF + '\n')
-        dir = fPDF.split('/')[3:6]
-        # del dir[0:2]
-        # del dir[-1]
-        print(dir)
-        max = len(fileName)
-        downloading['maximum'] = max
-        print(str(max) + ' max is \n')
-        downloading['value'] = 1
-        directory = '/'.join(dir) + '/'
-        if not os.path.exists(directory):
-            os.makedirs('/'.join(dir) + '/')
-
-        # for item in itertools.product(dir):
-        #     os.makedirs(os.path.join(*item))
-
-        for file in fileName:
-            clock()
-            global i
-            i = i + 1
-            downloading['value'] = i
-            print(i)
-            f = file.split("=")[-1]
-            name = file.split("/")
-            print('downloading ' + str(name[6]))
-            url = 'https://pastpapers.co' + f
-            pdfFile = urllib.request.Request(url, headers={
-                'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"})
-            with urllib.request.urlopen(pdfFile) as response, open(os.path.join(directory, name[6]),
-                                                                   'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
-
-        # print(links)
-        website.close()
-        i = 0
+    for file in fileName:
+        clock()
+        global i
+        i = i + 1
         downloading['value'] = i
+        print(i)
+
+        f = re.sub('[ ]',"%20",file)
+        url = re.sub('/wp-content/uploads/../..',"",f)
+        nameArray = url.split('%20')[1:10]
+        name = nameArray[0]+"_"+nameArray[1]+nameArray[2]+nameArray[3]+nameArray[4]+nameArray[len(nameArray)-1]
+        print(name)
+        print(url)
+        pdfFile = urllib.request.Request(url, headers={
+            'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"})
+        with urllib.request.urlopen(pdfFile) as response, open(os.path.join(directory, name),
+                                                               'wb') as out_file:
+            shutil.copyfileobj(response, out_file)
+
+    i = 0
+    downloading['value'] = i
 
     print(fileName)
     MainWebsite.close()
